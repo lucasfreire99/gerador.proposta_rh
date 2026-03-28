@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Gerador de Mensagem RH - BGP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060c);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #eef2ff;
+        }
+
+        .container {
+            max-width: 860px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(18, 25, 40, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            border: 1px solid rgba(66, 153, 225, 0.25);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(66, 153, 225, 0.1) inset;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .header {
+            padding: 1.8rem 2rem 0.8rem 2rem;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            background: rgba(2, 8, 20, 0.5);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #c4e0ff, #7aa9ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: inline-block;
+        }
+
+        .header p {
+            color: #9ca8c3;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-section {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #b9c8ff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group label i {
+            font-style: normal;
+            font-weight: 600;
+            background: #1e2a44;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #8bb5ff;
+        }
+
+        input, textarea {
+            background: #0f172ad9;
+            border: 1px solid #2d3a5e;
+            border-radius: 1.2rem;
+            padding: 0.85rem 1.2rem;
+            font-size: 0.95rem;
+            color: #f0f3fc;
+            font-weight: 500;
+            transition: all 0.2s;
+            outline: none;
+            font-family: 'Inter', monospace;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
+            background: #111827;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 85px;
+        }
+
+        .row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        @media (max-width: 640px) {
+            .row-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            .form-section {
+                padding: 1.5rem;
+            }
+            .header {
+                padding: 1.2rem 1.5rem;
+            }
+        }
+
+        .benefits-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-bottom: 0.25rem;
+            color: #b9c8ff;
+            letter-spacing: 0.3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-benefit-btn {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            color: #8bb5ff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .add-benefit-btn:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .benefits-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+            background: rgba(12, 20, 35, 0.6);
+            padding: 1rem 1.2rem;
+            border-radius: 1.5rem;
+            border: 1px solid #253453;
+            min-height: 100px;
+        }
+
+        .benefit-badge {
+            background: #0f1a2c;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #bbd7ff;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .benefit-badge[contenteditable="true"]:hover {
+            background: #1e2a44;
+            transform: scale(1.02);
+        }
+
+        .delete-benefit {
+            cursor: pointer;
+            font-size: 0.7rem;
+            padding: 0 0.2rem;
+            color: #ff8a8a;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .delete-benefit:hover {
+            opacity: 1;
+            color: #ff5555;
+        }
+
+        .preview-area {
+            background: #03070fcc;
+            border-radius: 1.5rem;
+            padding: 0.2rem;
+            border: 1px solid #2a3a60;
+            margin-top: 0.8rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.2rem;
+            border-bottom: 1px solid #1e2a44;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .preview-header span {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #8dabf0;
+            background: #0f172f;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .btn-copy {
+            background: linear-gradient(95deg, #1e2a3e, #0f172a);
+            border: 1px solid #3b82f6;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-copy:hover {
+            background: #1e3a8a;
+            border-color: #60a5fa;
+            transform: scale(0.97);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+
+        .message-preview {
+            padding: 1.4rem 1.5rem;
+            font-family: 'Inter', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #e2e8f0;
+            background: #050a12a0;
+            border-radius: 1rem;
+            margin: 0.8rem;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #1e293bdd;
+            backdrop-filter: blur(12px);
+            color: #bbf0ff;
+            padding: 0.7rem 1.6rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid #3b82f6;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            z-index: 999;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        .footer-note {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 1rem;
+            color: #6c7a9e;
+            border-top: 1px solid #172033;
+        }
+        
+        button {
+            background: none;
+            border: none;
+        }
+        
+        .reset-btn {
+            background: rgba(255, 100, 100, 0.1);
+            border: 1px solid #ff6b6b;
+            color: #ffaaaa;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+        }
+        
+        .reset-btn:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h1>⚡ Mensagem de Convite BGP</h1>
+            <p>Preencha os campos com os dados do candidato e gere a mensagem pronta para copiar no WhatsApp</p>
+        </div>
+
+        <div class="form-section">
+            <div class="row-grid">
+                <div class="input-group">
+                    <label>👤 Nome do candidato</label>
+                    <input type="text" id="candidato" placeholder="Ex: João Silva">
+                </div>
+                <div class="input-group">
+                    <label>💪 Referência</label>
+                    <input type="text" id="referencia" placeholder="Ex: Mecânico de Vibro (Juninho)">
+                </div>
+            </div>
+
+            <div class="row-grid">
+                <div class="input-group">
+                    <label>📍 Função</label>
+                    <input type="text" id="funcao" placeholder="Ex: OPERADOR DE VIBROS">
+                </div>
+                <div class="input-group">
+                    <label>💰 Salário base</label>
+                    <input type="text" id="salario" placeholder="R$ 1.621,00">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>📍 Projeto / Local</label>
+                <textarea id="localProjeto" rows="1">Projeto no Paraná em Santa Maria do Oeste</textarea>
+            </div>
+
+            <div class="benefits-title">
+                <span>🎁 Benefícios inclusos</span>
+                <div>
+                    <button class="add-benefit-btn" id="addBenefitBtn">+ Adicionar Benefício</button>
+                    <button class="reset-btn" id="resetBenefitsBtn">↺ Resetar</button>
+                </div>
+            </div>
+            <div class="benefits-tags" id="benefitsContainer">
+                <div class="benefit-badge" data-benefit="saude">✅ Plano de saúde SulAmérica</div>
+                <div class="benefit-badge" data-benefit="odonto">🦷 Plano Odontológico SulAmérica</div>
+                <div class="benefit-badge" data-benefit="vida">🛡️ Seguro de vida</div>
+                <div class="benefit-badge" data-benefit="aloj">🏠 Alojamento</div>
+                <div class="benefit-badge" data-benefit="alim">🥧 Alimentação</div>
+                <div class="benefit-badge" data-benefit="alim">👔 Lavanderia</div>
+                <div class="benefit-badge" data-benefit="ajuda">💲 Ajuda de custo viagem</div>
+            </div>
+            <div style="font-size:0.7rem; color:#7a89b0; margin-top:-0.5rem; text-align:right;">
+                ✔️ Clique nos badges para editar | ✖️ Passe o mouse e clique no ícone para remover
+            </div>
+
+            <div class="preview-area">
+                <div class="preview-header">
+                    <span>📋 MENSAGEM PERSONALIZADA</span>
+                    <button id="copyWhatsappBtn" class="btn-copy">
+                        💬 Copiar para WhatsApp
+                        <span style="font-size:1rem;">📱</span>
+                    </button>
+                </div>
+                <div id="messagePreview" class="message-preview">
+                    Carregando...
+                </div>
+            </div>
+        </div>
+        <div class="footer-note">
+            ✨ Todos os campos são editáveis. Clique nos benefícios para personalizar ou adicione novos.
+        </div>
+    </div>
+</div>
+<div id="toastMsg" class="toast">✅ Mensagem copiada! Pronta para o WhatsApp</div>
+
+<script>
+    const candidatoInput = document.getElementById('candidato');
+    const referenciaInput = document.getElementById('referencia');
+    const funcaoInput = document.getElementById('funcao');
+    const salarioInput = document.getElementById('salario');
+    const localProjetoInput = document.getElementById('localProjeto');
+    const previewDiv = document.getElementById('messagePreview');
+    const copyBtn = document.getElementById('copyWhatsappBtn');
+    const toast = document.getElementById('toastMsg');
+    const benefitsContainer = document.getElementById('benefitsContainer');
+    const addBenefitBtn = document.getElementById('addBenefitBtn');
+    const resetBenefitsBtn = document.getElementById('resetBenefitsBtn');
+
+    let beneficiosList = [];
+
+    function updateBenefitsFromBadges() {
+        beneficiosList = [];
+        document.querySelectorAll('.benefit-badge').forEach(badge => {
+            let text = badge.childNodes[0]?.nodeType === 3 ? badge.childNodes[0].textContent.trim() : badge.innerText.trim();
+            if (badge.querySelector('.delete-benefit')) {
+                text = text.replace('✖', '').trim();
+            }
+            beneficiosList.push(text);
+        });
+    }
+
+    function addDeleteButton(badge) {
+        if (!badge.querySelector('.delete-benefit')) {
+            const deleteBtn = document.createElement('span');
+            deleteBtn.textContent = ' ✖';
+            deleteBtn.className = 'delete-benefit';
+            deleteBtn.title = 'Remover benefício';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('Remover este benefício?')) {
+                    badge.remove();
+                    updateBenefitsFromBadges();
+                    generateAndRenderMessage();
+                }
+            };
+            badge.appendChild(deleteBtn);
+        }
+    }
+
+    function makeBadgesEditable() {
+        document.querySelectorAll('.benefit-badge').forEach(badge => {
+            if (badge.getAttribute('contenteditable') === 'true') return;
+            
+            badge.setAttribute('contenteditable', 'true');
+            badge.style.cursor = 'text';
+            badge.style.backgroundColor = '#16213e';
+            badge.style.transition = '0.1s';
+            
+            addDeleteButton(badge);
+            
+            badge.addEventListener('blur', () => {
+                updateBenefitsFromBadges();
+                generateAndRenderMessage();
+            });
+            
+            badge.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    badge.blur();
+                }
+            });
+        });
+        updateBenefitsFromBadges();
+    }
+
+    function generateMessage() {
+        const candidato = candidatoInput.value.trim() || "[Candidato]";
+        const referencia = referenciaInput.value.trim() || "[Quem Indicou]";
+        const funcao = funcaoInput.value.trim() || "Função";
+        const salario = salarioInput.value.trim() || "Salário Base";
+        let localProjeto = localProjetoInput.value.trim() || "Projeto no Paraná em Santa Maria do Oeste";
+        
+        updateBenefitsFromBadges();
+        
+        let beneficiosFormatados = "";
+        if (beneficiosList.length > 0) {
+            beneficiosFormatados = beneficiosList.map(b => `- ${b}`).join("\n");
+        } else {
+            beneficiosFormatados = "- Nenhum benefício cadastrado";
+        }
+        
+        let mensagem = `Bom dia, ${candidato}! 
+
+Meu nome é Lucas, sou do RH da BGP. Recebi seu contato através do ${referencia} e gostaria de saber se você tem interesse em atuar no ${localProjeto}, para a função de *${funcao}*.  
+
+O salário base é de *${salario}*.  
+
+*Benefícios:*  
+${beneficiosFormatados} 
+
+Aguardo seu retorno.`;
+
+        return mensagem;
+    }
+
+    function generateAndRenderMessage() {
+        const msg = generateMessage();
+        previewDiv.innerText = msg;
+    }
+
+    async function copyToClipboard() {
+        const messageText = generateMessage();
+        try {
+            await navigator.clipboard.writeText(messageText);
+            showToast("✅ Mensagem copiada! Agora cole no WhatsApp.");
+        } catch (err) {
+            fallbackCopy(messageText);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (success) {
+            showToast("📋 Copiado com sucesso!");
+        } else {
+            showToast("❌ Selecione manualmente e copie.", true);
+        }
+    }
+
+    function showToast(msg) {
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2200);
+    }
+
+    function addNewBenefit() {
+        const newBenefit = prompt('Digite o novo benefício:', '🎁 Novo benefício');
+        if (newBenefit && newBenefit.trim()) {
+            const newBadge = document.createElement('div');
+            newBadge.className = 'benefit-badge';
+            newBadge.textContent = newBenefit.trim();
+            benefitsContainer.appendChild(newBadge);
+            makeBadgesEditable();
+            updateBenefitsFromBadges();
+            generateAndRenderMessage();
+            showToast('✅ Benefício adicionado!');
+        }
+    }
+
+    function resetBenefits() {
+        if (confirm('Resetar para a lista padrão de benefícios?')) {
+            const defaultBenefits = [
+                "✅ Plano de saúde SulAmérica",
+                "🦷 Plano Odontológico SulAmérica",
+                "🛡️ Seguro de vida",
+                "🏠 Alojamento",
+                "🥧 Alimentação",
+                "👔 Lavanderia",
+                "💲 Ajuda de custo viagem"
+            ];
+            
+            benefitsContainer.innerHTML = '';
+            defaultBenefits.forEach(benefit => {
+                const badge = document.createElement('div');
+                badge.className = 'benefit-badge';
+                badge.textContent = benefit;
+                benefitsContainer.appendChild(badge);
+            });
+            
+            makeBadgesEditable();
+            updateBenefitsFromBadges();
+            generateAndRenderMessage();
+            showToast('↺ Benefícios resetados!');
+        }
+    }
+
+    function bindEvents() {
+        const inputs = [candidatoInput, referenciaInput, funcaoInput, salarioInput, localProjetoInput];
+        inputs.forEach(input => {
+            input.addEventListener('input', () => generateAndRenderMessage());
+        });
+        copyBtn.addEventListener('click', copyToClipboard);
+        addBenefitBtn.addEventListener('click', addNewBenefit);
+        resetBenefitsBtn.addEventListener('click', resetBenefits);
+    }
+
+    function observeBenefitChanges() {
+        const observer = new MutationObserver(() => {
+            updateBenefitsFromBadges();
+            generateAndRenderMessage();
+        });
+        
+        observer.observe(benefitsContainer, { childList: true, subtree: true, characterData: true });
+    }
+
+    function init() {
+        makeBadgesEditable();
+        observeBenefitChanges();
+        bindEvents();
+        generateAndRenderMessage();
+    }
+    
+    init();
+</script>
+</body>
+</html>
