@@ -39,8 +39,10 @@ Uma ferramenta web moderna e intuitiva para profissionais de RH criarem mensagen
 - **Font Inter** - Tipografia moderna e legível
 
 ## 📦 Estrutura do Projeto
+```
 ├── index.html # Arquivo principal da aplicação
 └── README.md # Documentação do projeto
+```
 
 text
 
