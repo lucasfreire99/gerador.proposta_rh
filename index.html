@@ -125,10 +125,51 @@
             gap: 1.2rem;
         }
 
+        .whatsapp-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .whatsapp-row .input-group {
+            flex: 1;
+        }
+
+        .btn-whatsapp-send {
+            background: linear-gradient(95deg, #075e54, #128c7e);
+            border: 1px solid #25d366;
+            color: white;
+            padding: 0.85rem 1.5rem;
+            border-radius: 1.2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            margin-bottom: 0;
+            height: fit-content;
+        }
+
+        .btn-whatsapp-send:hover {
+            background: linear-gradient(95deg, #075e54, #0a7c6e);
+            transform: scale(0.98);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+
         @media (max-width: 640px) {
             .row-grid {
                 grid-template-columns: 1fr;
                 gap: 1.2rem;
+            }
+            .whatsapp-row {
+                grid-template-columns: 1fr;
+            }
+            .btn-whatsapp-send {
+                justify-content: center;
             }
             .form-section {
                 padding: 1.5rem;
@@ -330,6 +371,12 @@
             background: #ff6b6b;
             color: white;
         }
+
+        .whatsapp-hint {
+            font-size: 0.7rem;
+            color: #7a89b0;
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -337,7 +384,7 @@
     <div class="card">
         <div class="header">
             <h1>⚡ Mensagem de Convite BGP</h1>
-            <p>Preencha os campos com os dados do candidato e gere a mensagem pronta para copiar no WhatsApp</p>
+            <p>Preencha os campos com os dados do candidato e gere a mensagem pronta para copiar ou enviar direto no WhatsApp</p>
         </div>
 
         <div class="form-section">
@@ -366,6 +413,19 @@
             <div class="input-group">
                 <label>📍 Projeto / Local</label>
                 <textarea id="localProjeto" rows="1">Projeto no Paraná em Santa Maria do Oeste</textarea>
+            </div>
+
+            <!-- Campo de WhatsApp com botão de envio direto -->
+            <div class="whatsapp-row">
+                <div class="input-group">
+                    <label>📱 WhatsApp do Candidato <i>(com DDD)</i></label>
+                    <input type="tel" id="whatsappNumero" placeholder="Ex: 41999999999">
+                    <div class="whatsapp-hint">Digite apenas números, incluindo o DDD (ex: 41999999999)</div>
+                </div>
+                <button id="sendWhatsappBtn" class="btn-whatsapp-send">
+                    💬 Enviar no WhatsApp
+                    <span>🚀</span>
+                </button>
             </div>
 
             <div class="benefits-title">
@@ -414,8 +474,10 @@
     const funcaoInput = document.getElementById('funcao');
     const salarioInput = document.getElementById('salario');
     const localProjetoInput = document.getElementById('localProjeto');
+    const whatsappNumeroInput = document.getElementById('whatsappNumero');
     const previewDiv = document.getElementById('messagePreview');
     const copyBtn = document.getElementById('copyWhatsappBtn');
+    const sendWhatsappBtn = document.getElementById('sendWhatsappBtn');
     const toast = document.getElementById('toastMsg');
     const benefitsContainer = document.getElementById('benefitsContainer');
     const addBenefitBtn = document.getElementById('addBenefitBtn');
@@ -537,7 +599,7 @@ Aguardo seu retorno.`;
         }
     }
 
-    function showToast(msg) {
+    function showToast(msg, isError = false) {
         toast.innerText = msg;
         toast.classList.add('show');
         setTimeout(() => {
@@ -586,12 +648,66 @@ Aguardo seu retorno.`;
         }
     }
 
+    function formatPhoneNumber(phone) {
+        // Remove tudo que não é número
+        let numbers = phone.replace(/\D/g, '');
+        
+        // Se tiver 55 no início (código do Brasil), mantém
+        if (numbers.startsWith('55')) {
+            return numbers;
+        }
+        
+        // Se não tiver, adiciona 55
+        return '55' + numbers;
+    }
+
+    function openWhatsApp() {
+        let phoneNumber = whatsappNumeroInput.value.trim();
+        
+        if (!phoneNumber) {
+            showToast("⚠️ Por favor, informe o número do WhatsApp do candidato!", true);
+            whatsappNumeroInput.focus();
+            return false;
+        }
+        
+        // Remove caracteres não numéricos
+        let cleanNumber = phoneNumber.replace(/\D/g, '');
+        
+        if (cleanNumber.length < 10) {
+            showToast("⚠️ Número inválido! Digite o número com DDD (ex: 41999999999)", true);
+            whatsappNumeroInput.focus();
+            return false;
+        }
+        
+        // Formata para o padrão internacional
+        let formattedNumber = formatPhoneNumber(cleanNumber);
+        
+        // Gera a mensagem
+        const message = generateMessage();
+        
+        // Codifica a mensagem para URL
+        const encodedMessage = encodeURIComponent(message);
+        
+        // Cria o link do WhatsApp Web
+        const whatsappUrl = `https://wa.me/${formattedNumber}`;
+        
+        // Abre em nova aba
+        window.open(whatsappUrl, '_blank');
+        
+        showToast("📱 Abrindo WhatsApp... Envie a mensagem quando abrir!");
+        return true;
+    }
+
     function bindEvents() {
         const inputs = [candidatoInput, referenciaInput, funcaoInput, salarioInput, localProjetoInput];
         inputs.forEach(input => {
             input.addEventListener('input', () => generateAndRenderMessage());
         });
+        
+        whatsappNumeroInput.addEventListener('input', () => generateAndRenderMessage());
+        
         copyBtn.addEventListener('click', copyToClipboard);
+        sendWhatsappBtn.addEventListener('click', openWhatsApp);
         addBenefitBtn.addEventListener('click', addNewBenefit);
         resetBenefitsBtn.addEventListener('click', resetBenefits);
     }
