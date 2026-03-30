@@ -558,7 +558,7 @@
         
         let mensagem = `Bom dia, ${candidato}! 
 
-Meu nome é Lucas, sou do RH da BGP. Recebi seu contato através do ${referencia} e gostaria de saber se você tem interesse em atuar no ${localProjeto}, para a função de *${funcao}*.  
+Meu nome é Lucas, trabalho no RH da BGP. Recebi seu currículo através do ${referencia} e gostaria de saber se você tem interesse em atuar no ${localProjeto}, para a função de *${funcao}*.  
 
 O salário base é de *${salario}*.  
 
@@ -579,7 +579,7 @@ Aguardo seu retorno.`;
         const messageText = generateMessage();
         try {
             await navigator.clipboard.writeText(messageText);
-            showToast("✅ Mensagem copiada! Agora cole no WhatsApp.");
+            showToast("✅ Mensagem copiada!");
         } catch (err) {
             fallbackCopy(messageText);
         }
