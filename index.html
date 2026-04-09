@@ -2,8 +2,9 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' font-size='80'%3E⚡%3C/text%3E%3C/svg%3E">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Gerador de Mensagem RH</title>
+    <title>Gerador de Proposta RH</title>
     <style>
         * {
             margin: 0;
@@ -23,7 +24,7 @@
         }
 
         .container {
-            max-width: 860px;
+            max-width: 960px;
             width: 100%;
             margin: 0 auto;
         }
@@ -95,7 +96,7 @@
             color: #8bb5ff;
         }
 
-        input, textarea {
+        input, textarea, select {
             background: #0f172ad9;
             border: 1px solid #2d3a5e;
             border-radius: 1.2rem;
@@ -108,7 +109,11 @@
             font-family: 'Inter', monospace;
         }
 
-        input:focus, textarea:focus {
+        select {
+            cursor: pointer;
+        }
+
+        input:focus, textarea:focus, select:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
             background: #111827;
@@ -122,6 +127,12 @@
         .row-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        .row-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 1.2rem;
         }
 
@@ -160,8 +171,8 @@
             box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
         }
 
-        @media (max-width: 640px) {
-            .row-grid {
+        @media (max-width: 768px) {
+            .row-grid, .row-grid-3 {
                 grid-template-columns: 1fr;
                 gap: 1.2rem;
             }
@@ -189,6 +200,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .add-benefit-btn {
@@ -377,28 +390,74 @@
             color: #7a89b0;
             margin-top: 0.25rem;
         }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-transform: none;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+
+        .referencia-group {
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .referencia-group.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="card">
         <div class="header">
-            <h1>⚡ Mensagem de Convite</h1>
+            <h1>⚡ Gerador de Proposta RH</h1>
             <p>Preencha os campos com os dados do candidato e gere a mensagem pronta para copiar ou enviar direto no WhatsApp</p>
         </div>
 
         <div class="form-section">
-            <div class="row-grid">
+            <!-- Linha 1: Saudação e Funcionário RH -->
+            <div class="row-grid-3">
+                <div class="input-group">
+                    <label>🌅 Saudação</label>
+                    <select id="saudacao">
+                        <option value="Bom dia">🌞 Bom dia</option>
+                        <option value="Boa tarde">☀️ Boa tarde</option>
+                        <option value="Boa noite">🌙 Boa noite</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>👔 Funcionário RH</label>
+                    <select id="rhFuncionario">
+                        <option value="Lucas">Lucas</option>
+                        <option value="Bruzaca">Bruzaca</option>
+                    </select>
+                </div>
                 <div class="input-group">
                     <label>👤 Nome do candidato</label>
                     <input type="text" id="candidato" placeholder="Ex: João Silva">
                 </div>
-                <div class="input-group">
-                    <label>💪 Referência</label>
-                    <input type="text" id="referencia" placeholder="Ex: Mecânico de Vibro (Juninho)">
-                </div>
             </div>
 
+            <!-- Linha 2: Função e Salário -->
             <div class="row-grid">
                 <div class="input-group">
                     <label>📍 Função</label>
@@ -410,12 +469,27 @@
                 </div>
             </div>
 
+            <!-- Local do Projeto -->
             <div class="input-group">
                 <label>📍 Projeto / Local</label>
                 <textarea id="localProjeto" rows="1">Projeto no Paraná em Santa Maria do Oeste</textarea>
             </div>
 
-            <!-- Campo de WhatsApp com botão de envio direto -->
+            <!-- Checkbox de Referência -->
+            <div class="input-group">
+                <label>🔗 Referência</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="temReferencia" checked>
+                        Teve indicação de alguém?
+                    </label>
+                </div>
+                <div id="referenciaGroup" class="referencia-group">
+                    <input type="text" id="referencia" placeholder="Ex: Mecânico de Vibro (Juninho)">
+                </div>
+            </div>
+
+            <!-- WhatsApp -->
             <div class="whatsapp-row">
                 <div class="input-group">
                     <label>📱 WhatsApp do Candidato <i>(com DDD)</i></label>
@@ -428,6 +502,7 @@
                 </button>
             </div>
 
+            <!-- Benefícios -->
             <div class="benefits-title">
                 <span>🎁 Benefícios inclusos</span>
                 <div>
@@ -448,10 +523,11 @@
                 ✔️ Clique nos badges para editar | ✖️ Passe o mouse e clique no ícone para remover
             </div>
 
+            <!-- Preview -->
             <div class="preview-area">
                 <div class="preview-header">
                     <span>📋 MENSAGEM PERSONALIZADA</span>
-                    <button id="copyWhatsappBtn" class="btn-copy">
+                    <button id="copyWhatsappBtn" class="btn-copy" aria-label="Copiar mensagem para área de transferência">
                         💬 Copiar para WhatsApp
                         <span style="font-size:1rem;">📱</span>
                     </button>
@@ -469,8 +545,13 @@
 <div id="toastMsg" class="toast">✅ Mensagem copiada! Pronta para o WhatsApp</div>
 
 <script>
+    // Elementos DOM
+    const saudacaoSelect = document.getElementById('saudacao');
+    const rhFuncionarioSelect = document.getElementById('rhFuncionario');
     const candidatoInput = document.getElementById('candidato');
     const referenciaInput = document.getElementById('referencia');
+    const temReferenciaCheckbox = document.getElementById('temReferencia');
+    const referenciaGroup = document.getElementById('referenciaGroup');
     const funcaoInput = document.getElementById('funcao');
     const salarioInput = document.getElementById('salario');
     const localProjetoInput = document.getElementById('localProjeto');
@@ -484,16 +565,31 @@
     const resetBenefitsBtn = document.getElementById('resetBenefitsBtn');
 
     let beneficiosList = [];
+    let saveTimeout = null;
+
+    // Sanitização de texto
+    function sanitizeText(text) {
+        if (!text) return '';
+        let div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Extrair texto do badge ignorando o botão de delete
+    function getBadgeText(badge) {
+        const clone = badge.cloneNode(true);
+        const deleteBtn = clone.querySelector('.delete-benefit');
+        if (deleteBtn) deleteBtn.remove();
+        return clone.textContent.trim();
+    }
 
     function updateBenefitsFromBadges() {
         beneficiosList = [];
         document.querySelectorAll('.benefit-badge').forEach(badge => {
-            let text = badge.childNodes[0]?.nodeType === 3 ? badge.childNodes[0].textContent.trim() : badge.innerText.trim();
-            if (badge.querySelector('.delete-benefit')) {
-                text = text.replace('✖', '').trim();
-            }
+            let text = getBadgeText(badge);
             beneficiosList.push(text);
         });
+        saveToLocalStorage();
     }
 
     function addDeleteButton(badge) {
@@ -502,12 +598,13 @@
             deleteBtn.textContent = ' ✖';
             deleteBtn.className = 'delete-benefit';
             deleteBtn.title = 'Remover benefício';
+            deleteBtn.setAttribute('aria-label', 'Remover benefício');
             deleteBtn.onclick = (e) => {
                 e.stopPropagation();
                 if (confirm('Remover este benefício?')) {
                     badge.remove();
                     updateBenefitsFromBadges();
-                    generateAndRenderMessage();
+                    debouncedRender();
                 }
             };
             badge.appendChild(deleteBtn);
@@ -522,12 +619,13 @@
             badge.style.cursor = 'text';
             badge.style.backgroundColor = '#16213e';
             badge.style.transition = '0.1s';
+            badge.setAttribute('aria-label', 'Benefício editável - clique para modificar');
             
             addDeleteButton(badge);
             
             badge.addEventListener('blur', () => {
                 updateBenefitsFromBadges();
-                generateAndRenderMessage();
+                debouncedRender();
             });
             
             badge.addEventListener('keypress', (e) => {
@@ -540,10 +638,14 @@
         updateBenefitsFromBadges();
     }
 
+    // Função principal de geração de mensagem
     function generateMessage() {
+        const saudacao = saudacaoSelect.value;
+        const rhFuncionario = rhFuncionarioSelect.value;
         const candidato = candidatoInput.value.trim() || "[Candidato]";
-        const referencia = referenciaInput.value.trim() || "[Quem Indicou]";
-        const funcao = funcaoInput.value.trim() || "Função";
+        const temReferencia = temReferenciaCheckbox.checked;
+        const referencia = temReferencia ? (referenciaInput.value.trim() || "[Quem Indicou]") : null;
+        const funcao = funcaoInput.value.trim() || "Função não informada";
         const salario = salarioInput.value.trim() || "Salário Base";
         let localProjeto = localProjetoInput.value.trim() || "Projeto no Paraná em Santa Maria do Oeste";
         
@@ -556,30 +658,96 @@
             beneficiosFormatados = "- Nenhum benefício cadastrado";
         }
         
-        let mensagem = `Bom dia, ${candidato}! 
-
-Meu nome é Lucas, trabalho no RH da BGP. Recebi seu currículo através do ${referencia} e gostaria de saber se você tem interesse em atuar no ${localProjeto}, para a função de *${funcao}*.  
-
-O salário base é de *${salario}*.  
-
-*Benefícios:*  
-${beneficiosFormatados} 
-
-Aguardo seu retorno.`;
-
+        let mensagem = `${saudacao}, ${candidato}! \n\n`;
+        mensagem += `Meu nome é ${rhFuncionario}, trabalho no RH da BGP. `;
+        
+        if (temReferencia && referencia) {
+            mensagem += `Recebi seu currículo através do ${referencia} `;
+        } else {
+            mensagem += `Recebi seu currículo `;
+        }
+        
+        mensagem += `e gostaria de saber se você tem interesse em atuar no ${localProjeto}, para a função de *${funcao}*.  \n\n`;
+        mensagem += `O salário base é de *${salario}*.  \n\n`;
+        mensagem += `*Benefícios:*  \n${beneficiosFormatados} \n\n`;
+        mensagem += `Aguardo seu retorno.`;
+        
         return mensagem;
+    }
+
+    // Debounce para performance
+    let renderTimeout;
+    function debouncedRender() {
+        clearTimeout(renderTimeout);
+        renderTimeout = setTimeout(() => {
+            generateAndRenderMessage();
+        }, 300);
     }
 
     function generateAndRenderMessage() {
         const msg = generateMessage();
         previewDiv.innerText = msg;
+        saveToLocalStorage();
+    }
+
+    // LocalStorage
+    function saveToLocalStorage() {
+        if (saveTimeout) clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            const formData = {
+                saudacao: saudacaoSelect.value,
+                rhFuncionario: rhFuncionarioSelect.value,
+                candidato: candidatoInput.value,
+                temReferencia: temReferenciaCheckbox.checked,
+                referencia: referenciaInput.value,
+                funcao: funcaoInput.value,
+                salario: salarioInput.value,
+                localProjeto: localProjetoInput.value,
+                whatsapp: whatsappNumeroInput.value,
+                beneficios: beneficiosList
+            };
+            localStorage.setItem('rhMessageDraft', JSON.stringify(formData));
+        }, 500);
+    }
+
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem('rhMessageDraft');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                saudacaoSelect.value = data.saudacao || 'Bom dia';
+                rhFuncionarioSelect.value = data.rhFuncionario || 'Lucas';
+                candidatoInput.value = data.candidato || '';
+                temReferenciaCheckbox.checked = data.temReferencia !== undefined ? data.temReferencia : true;
+                referenciaInput.value = data.referencia || '';
+                funcaoInput.value = data.funcao || '';
+                salarioInput.value = data.salario || '';
+                localProjetoInput.value = data.localProjeto || 'Projeto no Paraná em Santa Maria do Oeste';
+                whatsappNumeroInput.value = data.whatsapp || '';
+                
+                if (data.beneficios && data.beneficios.length > 0) {
+                    benefitsContainer.innerHTML = '';
+                    data.beneficios.forEach(benefit => {
+                        const badge = document.createElement('div');
+                        badge.className = 'benefit-badge';
+                        badge.textContent = benefit;
+                        benefitsContainer.appendChild(badge);
+                    });
+                    makeBadgesEditable();
+                }
+                
+                toggleReferenciaInput();
+            } catch(e) {
+                console.log('Erro ao carregar localStorage:', e);
+            }
+        }
     }
 
     async function copyToClipboard() {
         const messageText = generateMessage();
         try {
             await navigator.clipboard.writeText(messageText);
-            showToast("✅ Mensagem copiada!");
+            showToast("✅ Mensagem copiada! Pronta para o WhatsApp");
         } catch (err) {
             fallbackCopy(messageText);
         }
@@ -610,13 +778,14 @@ Aguardo seu retorno.`;
     function addNewBenefit() {
         const newBenefit = prompt('Digite o novo benefício:', '🎁 Novo benefício');
         if (newBenefit && newBenefit.trim()) {
+            const sanitizedBenefit = sanitizeText(newBenefit.trim());
             const newBadge = document.createElement('div');
             newBadge.className = 'benefit-badge';
-            newBadge.textContent = newBenefit.trim();
+            newBadge.textContent = sanitizedBenefit;
             benefitsContainer.appendChild(newBadge);
             makeBadgesEditable();
             updateBenefitsFromBadges();
-            generateAndRenderMessage();
+            debouncedRender();
             showToast('✅ Benefício adicionado!');
         }
     }
@@ -643,22 +812,30 @@ Aguardo seu retorno.`;
             
             makeBadgesEditable();
             updateBenefitsFromBadges();
-            generateAndRenderMessage();
+            debouncedRender();
             showToast('↺ Benefícios resetados!');
         }
     }
 
     function formatPhoneNumber(phone) {
-        // Remove tudo que não é número
         let numbers = phone.replace(/\D/g, '');
-        
-        // Se tiver 55 no início (código do Brasil), mantém
         if (numbers.startsWith('55')) {
             return numbers;
         }
-        
-        // Se não tiver, adiciona 55
         return '55' + numbers;
+    }
+
+    function validateWhatsApp(phone) {
+        const clean = phone.replace(/\D/g, '');
+        if (clean.length < 10 || clean.length > 13) {
+            return false;
+        }
+        const ddd = clean.substring(0, 2);
+        if (ddd < 11 || ddd > 99) {
+            return false;
+        }
+        const number = clean.substring(2);
+        return number.length >= 8 && number.length <= 9;
     }
 
     function openWhatsApp() {
@@ -670,41 +847,43 @@ Aguardo seu retorno.`;
             return false;
         }
         
-        // Remove caracteres não numéricos
         let cleanNumber = phoneNumber.replace(/\D/g, '');
         
-        if (cleanNumber.length < 10) {
+        if (!validateWhatsApp(cleanNumber)) {
             showToast("⚠️ Número inválido! Digite o número com DDD (ex: 41999999999)", true);
             whatsappNumeroInput.focus();
             return false;
         }
         
-        // Formata para o padrão internacional
         let formattedNumber = formatPhoneNumber(cleanNumber);
-        
-        // Gera a mensagem
         const message = generateMessage();
-        
-        // Codifica a mensagem para URL
         const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
         
-        // Cria o link do WhatsApp Web
-        const whatsappUrl = `https://wa.me/${formattedNumber}`;
-        
-        // Abre em nova aba
         window.open(whatsappUrl, '_blank');
-        
-        showToast("📱 Abrindo WhatsApp... Envie a mensagem quando abrir!");
+        showToast("📱 Abrindo WhatsApp...");
         return true;
     }
 
+    function toggleReferenciaInput() {
+        if (temReferenciaCheckbox.checked) {
+            referenciaGroup.classList.remove('hidden');
+        } else {
+            referenciaGroup.classList.add('hidden');
+            referenciaInput.value = '';
+        }
+        debouncedRender();
+    }
+
     function bindEvents() {
-        const inputs = [candidatoInput, referenciaInput, funcaoInput, salarioInput, localProjetoInput];
+        const inputs = [candidatoInput, referenciaInput, funcaoInput, salarioInput, localProjetoInput, whatsappNumeroInput];
         inputs.forEach(input => {
-            input.addEventListener('input', () => generateAndRenderMessage());
+            input.addEventListener('input', () => debouncedRender());
         });
         
-        whatsappNumeroInput.addEventListener('input', () => generateAndRenderMessage());
+        saudacaoSelect.addEventListener('change', () => debouncedRender());
+        rhFuncionarioSelect.addEventListener('change', () => debouncedRender());
+        temReferenciaCheckbox.addEventListener('change', toggleReferenciaInput);
         
         copyBtn.addEventListener('click', copyToClipboard);
         sendWhatsappBtn.addEventListener('click', openWhatsApp);
@@ -715,16 +894,18 @@ Aguardo seu retorno.`;
     function observeBenefitChanges() {
         const observer = new MutationObserver(() => {
             updateBenefitsFromBadges();
-            generateAndRenderMessage();
+            debouncedRender();
         });
         
         observer.observe(benefitsContainer, { childList: true, subtree: true, characterData: true });
     }
 
     function init() {
+        loadFromLocalStorage();
         makeBadgesEditable();
         observeBenefitChanges();
         bindEvents();
+        toggleReferenciaInput();
         generateAndRenderMessage();
     }
     
